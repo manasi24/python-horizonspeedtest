@@ -28,3 +28,8 @@ class PageSourceException(Exception):
 class MissingConfigurationParameterException(Exception):
     """ Required parameter was missing from configuration file """
     pass
+
+class ErrorDisplayedException(Exception):
+    """ Error message displayed on horizon screen """
+    pass
+

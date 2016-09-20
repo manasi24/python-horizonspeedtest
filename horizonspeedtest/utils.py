@@ -30,6 +30,7 @@ def perform_on_cloud(cloud,cfg,show_browser):
             cfg['horizon_login_url'],
             cfg['horizon_switch_tenant_url'],
             cfg['horizon_volumes_url'],
+            cfg['horizon_networks_url'],
             cfg['horizon_instances_url'],
             cfg['horizon_images_url'],
             cfg['horizon_logout_url'],
@@ -43,6 +44,7 @@ def perform_on_cloud(cloud,cfg,show_browser):
     c.switch_horizon_tenant()
     t_instances = c.load_instances_page()
     t_images = c.load_images_page()
+    t_networks = c.load_networks_page()
     t_volumes = c.load_volumes_page()
 
     # Logout once done
@@ -54,6 +56,7 @@ def perform_on_cloud(cloud,cfg,show_browser):
     d['time_login'] = t_login['Login Page']
     d['time_instances'] = t_instances['Instances Page']
     d['time_volumes'] = t_volumes['Volumes Page']
+    d['time_networks'] = t_networks['Networks Page']
     d['time_images'] = t_images['Images Page']
 
     l = []
@@ -61,6 +64,7 @@ def perform_on_cloud(cloud,cfg,show_browser):
     l.append(d['time_login'])
     l.append(d['time_instances'])
     l.append(d['time_volumes'])
+    l.append(d['time_networks'])
     l.append(d['time_images'])
 
     return l
@@ -69,5 +73,5 @@ def pretty_print(result_list):
     """ Prints the resultset as a table, one row per object """
     from tabulate import tabulate
     table = tabulate(result_list, tablefmt='psql',stralign='right',
-                     headers=[ 'cloud_name', 'time_login', 'time_instances', 'time_volumes', 'time_images'] )
+                     headers=[ 'cloud_name', 'time_login', 'time_instances', 'time_volumes', 'time_networks', 'time_images'] )
     return table

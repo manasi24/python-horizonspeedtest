@@ -6,6 +6,7 @@ devstack-juno:
   horizon_instances_url: "https://192.168.23.100/horizon/project/instances/"
   horizon_volumes_url: "https://192.168.23.100/horizon/project/volumes/"
   horizon_images_url: "https://192.168.23.100/horizon/project/images/"
+  horizon_networks_url: "https://192.168.23.100/horizon/project/networks/"
   horizon_logout_url: "https://192.168.23.100/horizon/auth/logout/"
 
 devstack-kilo-custom:
@@ -16,5 +17,5 @@ devstack-kilo-custom:
    horizon_instances_url: "http://192.168.27.100/project/instances/"
    horizon_volumes_url: "http://192.168.27.100/project/volumes/"
    horizon_images_url: "http://192.168.27.100/project/images/"
+   horizon_networks_url: "http://192.168.27.100/project/networks/"
    horizon_logout_url: "http://192.168.27.100/auth/logout"
- 

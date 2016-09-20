@@ -71,6 +71,9 @@ def main():
     except exceptions.PageSourceException as exc:
         print ("Invalid Page Source or URL: {}.".format(str(exc)))
         sys.exit(constants.INVALID_URL_OR_PAGE)
+    except exceptions.ErrorDisplayedException as exc:
+        print ("Error Displayed: {}.".format(str(exc)))
+        #sys.exit(constants.INVALID_URL_OR_PAGE)
 
 
 if __name__ == "__main__":

@@ -24,14 +24,16 @@ from horizonspeedtest import exceptions
 
 class HorizonSpeedTest(object):
     def __init__(self, username, password, horizon_login_url,
-            horizon_switch_tenant_url, horizon_volumes_url, horizon_instances_url,
-            horizon_images_url,horizon_logout_url,show_browser=False):
+            horizon_switch_tenant_url, horizon_volumes_url, 
+	    horizon_instances_url, horizon_networks_url, horizon_images_url,
+	    horizon_logout_url,show_browser=False):
         """ Initialize parameters for the target cloud """
         self.username = username
         self.password = password
         self.horizon_login_url = horizon_login_url
         self.horizon_switch_tenant_url = horizon_switch_tenant_url
         self.horizon_volumes_url = horizon_volumes_url
+        self.horizon_networks_url = horizon_networks_url
         self.horizon_instances_url = horizon_instances_url
         self.horizon_images_url = horizon_images_url
         self.horizon_logout_url = horizon_logout_url
@@ -39,9 +41,17 @@ class HorizonSpeedTest(object):
         self.driver = None
         self.display = None
 
+	self.error_file = open("errors.txt", "w")
+	self.error_file.close()
+
         if self.show_browser is False:
            self.display = Display(visible=0, size=(800, 600))
            self.display.start()
+
+	fp = webdriver.FirefoxProfile()
+	# Direct = 0, Manual = 1, PAC = 2, AUTODETECT = 4, SYSTEM = 5
+	#fp.set_preference("network.proxy.type", 0)
+	#self.driver = webdriver.Firefox(firefox_profile=fp)
 
         self.driver = webdriver.Firefox()
 
@@ -55,7 +65,8 @@ class HorizonSpeedTest(object):
             pageElement.send_keys(self.username)
             pageElement = self.driver.find_element_by_name("password")
             pageElement.send_keys(self.password)
-            pageElement.submit()
+	    pageElement = self.driver.find_element_by_css_selector("button[type='submit']")
+	    pageElement.click()
 
         except NoSuchElementException:
             raise exceptions.PageSourceException("Element not found")
@@ -75,6 +86,7 @@ class HorizonSpeedTest(object):
         totalTime = (backendPerformance + frontendPerformance) 
 
         logging.info("load time [Login Page] is {} ms".format(totalTime))
+
         return { 'Login Page': str(totalTime) + " ms" }
 
 
@@ -106,12 +118,24 @@ class HorizonSpeedTest(object):
         totalTime = (backendPerformance + frontendPerformance) 
 
         logging.info("load time [%s] is %s ms" % (tag,totalTime))
+
+        if "Error: " in self.driver.page_source:
+	    try:
+                error_msg = self.driver.find_element_by_css_selector("html > body > div#container > div#main_content > div.messages > div.alert.alert-danger.alert-dismissable.fade.in > p")
+            except Exception as inst:
+                with open("errors.txt", "a") as myfile:
+		    myfile.write(type(inst))
+                    myfile.write(source)
+                    myfile.write(tag)
+                    myfile.write(error_msg.text)
+
         return { tag: str(totalTime) + " ms" }
 
 
     def load_images_page(self):
         """ Navigate to Images Page """
-        logging.info("loading images page {}".format(self.horizon_instances_url))
+        logging.info("loading images page {}".format(self.horizon_images_url))
+
         return self._load_page_measure_time(self.driver,self.horizon_images_url,
                 tag = "Images Page")
 
@@ -119,17 +143,27 @@ class HorizonSpeedTest(object):
     def load_instances_page(self):
         """ Navigate to Instances Page """
         logging.info("loading instances page {}".format(self.horizon_instances_url))
+
         return self._load_page_measure_time(self.driver, self.horizon_instances_url,
                 tag = "Instances Page")
 
 
+    def load_networks_page(self):
+        """ Navigate to the Networks Page """
+        logging.info("loading networks page {}".format(self.horizon_networks_url))
+
+        return self._load_page_measure_time(self.driver, self.horizon_networks_url,
+                tag = "Networks Page")
+
     def load_volumes_page(self):
         """ Navigate to the Volumes Page """
         logging.info("loading volumes page {}".format(self.horizon_volumes_url))
+
         return self._load_page_measure_time(self.driver, self.horizon_volumes_url,
                 tag = "Volumes Page")
 
 
     def _driverQuit(self):
         self.driver.close()
-
+	if self.show_browser is False:
+           self.display.stop()
