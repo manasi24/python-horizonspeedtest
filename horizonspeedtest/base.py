@@ -29,7 +29,7 @@ from horizonspeedtest import exceptions
 class HorizonSpeedTest(object):
     def __init__(self, username, password, auth_type, 
             horizon_login_url, horizon_switch_tenant_url, horizon_volumes_url, 
-	    horizon_instances_url, horizon_networks_url, horizon_images_url,
+	    horizon_networks_url, horizon_instances_url, horizon_images_url,
 	    horizon_logout_url,show_browser=False):
         """ Initialize parameters for the target cloud """
         self.username = username
