@@ -27,6 +27,7 @@ def perform_on_cloud(cloud,cfg,show_browser):
         c = base.HorizonSpeedTest(
             cfg['username'],
             cfg['password'],
+            cfg['auth_type'],
             cfg['horizon_login_url'],
             cfg['horizon_switch_tenant_url'],
             cfg['horizon_volumes_url'],

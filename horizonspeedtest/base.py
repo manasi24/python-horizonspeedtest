@@ -17,19 +17,24 @@
 
 import logging
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support import expected_conditions as EC
 from pyvirtualdisplay import Display
 
 from horizonspeedtest import exceptions
 
 class HorizonSpeedTest(object):
-    def __init__(self, username, password, horizon_login_url,
-            horizon_switch_tenant_url, horizon_volumes_url, 
+    def __init__(self, username, password, auth_type, 
+            horizon_login_url, horizon_switch_tenant_url, horizon_volumes_url, 
 	    horizon_instances_url, horizon_networks_url, horizon_images_url,
 	    horizon_logout_url,show_browser=False):
         """ Initialize parameters for the target cloud """
         self.username = username
         self.password = password
+        self.auth_type = auth_type
         self.horizon_login_url = horizon_login_url
         self.horizon_switch_tenant_url = horizon_switch_tenant_url
         self.horizon_volumes_url = horizon_volumes_url
@@ -61,12 +66,29 @@ class HorizonSpeedTest(object):
         logging.info("logging into {}".format(self.horizon_login_url))
         try:
             self.driver.get(self.horizon_login_url)
-            pageElement = self.driver.find_element_by_name("username")
-            pageElement.send_keys(self.username)
-            pageElement = self.driver.find_element_by_name("password")
-            pageElement.send_keys(self.password)
-	    pageElement = self.driver.find_element_by_css_selector("button[type='submit']")
-	    pageElement.click()
+            pageElement = Select(self.driver.find_element_by_name("auth_type"))
+            if self.auth_type == 'Keystone':
+                pageElement.select_by_value('credentials')
+                #pageElement.select_by_visible_text('Keystone Credentials')
+                pageElement = self.driver.find_element_by_name("username")
+                pageElement.send_keys(self.username)
+                pageElement = self.driver.find_element_by_name("password")
+                pageElement.send_keys(self.password)
+	        pageElement = self.driver.find_element_by_css_selector("button[type='submit']")
+	        pageElement.click()
+            else:
+                #pageElement.select_by_value('saml2')
+	        pageElement = self.driver.find_element_by_id("loginBtn")
+	        pageElement.click()
+                element = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.NAME, "username")))
+	        #pageElement = self.driver.find_element_by_name("Connect")
+                pageElement = self.driver.find_element_by_name("username")
+                pageElement.send_keys(self.username)
+                pageElement = self.driver.find_element_by_name("password")
+                pageElement.send_keys(self.password)
+	        pageElement = self.driver.find_element_by_css_selector("input[type='submit'][value='Login']")
+	        pageElement.click()
 
         except NoSuchElementException:
             raise exceptions.PageSourceException("Element not found")
